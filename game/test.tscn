@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://test_scene_001"]
+
+[node name="TestRoot" type="Node"]
+
+[node name="Label" type="Label" parent="."]
+text = "Test Scene"

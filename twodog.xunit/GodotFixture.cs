@@ -14,6 +14,9 @@ public class GodotFixture : IDisposable
         // Resolve the project path relative to the assembly location
         var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var projectPath = Path.GetFullPath(Path.Combine(assemblyDir, "..", "..", "..", "..", "project"));
+        
+        // Note: GODOT_ASSEMBLY_DIR is automatically set by the Engine static constructor
+        // to help libgodot find GodotPlugins.dll and GodotSharp.dll
 
         Engine = new Engine("twodog.tests", projectPath);
         GodotInstance = Engine.Start();
@@ -22,7 +25,7 @@ public class GodotFixture : IDisposable
 
     public Engine Engine { get; }
 
-    public GodotInstance GodotInstance { get; }
+    public GodotInstanceHandle GodotInstance { get; }
 
     public SceneTree Tree => Engine.Tree;
 

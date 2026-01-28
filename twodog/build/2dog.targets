@@ -60,11 +60,16 @@
         <!--
           Destination path depends on build type:
           - Editor builds: GodotSharp/Api/Debug/ subdirectory (required by TOOLS_ENABLED native code)
-          - template_debug: GodotSharp/Api/Debug/ subdirectory (same as editor)
+          - template_debug: Flat in output directory (LIBGODOT_HOSTFXR uses cwd-based lookup)
           - template_release: Flat in output directory (LIBGODOT_HOSTFXR only)
+          
+          Note: For libgodot embedding, we use flat structure because:
+          1. GodotSharp.dll comes from NuGet and is already flat in output
+          2. We only need to add GodotPlugins.dll alongside it
+          3. libgodot looks for GodotPlugins.dll in cwd first (flat structure)
         -->
         <TwoDogGodotApiDestSubdir Condition="'$(TwoDogBuildType)' == 'editor'">GodotSharp/Api/Debug/</TwoDogGodotApiDestSubdir>
-        <TwoDogGodotApiDestSubdir Condition="'$(TwoDogBuildType)' == 'template_debug'">GodotSharp/Api/Debug/</TwoDogGodotApiDestSubdir>
+        <TwoDogGodotApiDestSubdir Condition="'$(TwoDogBuildType)' == 'template_debug'"></TwoDogGodotApiDestSubdir>
         <TwoDogGodotApiDestSubdir Condition="'$(TwoDogBuildType)' == 'template_release'"></TwoDogGodotApiDestSubdir>
         <TwoDogGodotApiDestSubdir Condition="'$(TwoDogGodotApiDestSubdir)' == ''"></TwoDogGodotApiDestSubdir>
     </PropertyGroup>

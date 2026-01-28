@@ -18,7 +18,7 @@ public class Engine(string project, string? path = null, params string[] args) :
         Destroy();
     }
 
-    public GodotInstance Start()
+    public GodotInstanceHandle Start()
     {
         if (_godotInstancePtr != IntPtr.Zero)
             throw new InvalidOperationException(
@@ -52,14 +52,8 @@ public class Engine(string project, string? path = null, params string[] args) :
             throw new Exception($"{nameof(Engine)}: Error starting Godot instance");
         }
 
-        // Get the GodotInstance object from the native pointer
+        // Get the GodotInstanceHandle from the native pointer
         var godotInstance = LibGodot.GetGodotInstanceFromPtr(_godotInstancePtr);
-        if (godotInstance == null)
-        {
-            Console.Error.WriteLine($"{nameof(Engine)}: Failed to get GodotInstance from pointer");
-            LibGodot.libgodot_destroy_godot_instance(_godotInstancePtr);
-            throw new NullReferenceException($"{nameof(Engine)}: Failed to get GodotInstance from pointer.");
-        }
 
         Console.WriteLine($"{nameof(Engine)}: Godot started successfully!");
         return godotInstance;

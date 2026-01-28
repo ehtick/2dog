@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Godot;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable once IdentifierTypo
@@ -39,8 +38,9 @@ internal static unsafe partial class LibGodot
     private static delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void> objectMethodBindPtrcall;
     private static delegate* unmanaged[Cdecl]<nint, nint, byte, void> stringNameNewWithLatin1Chars;
 
-    // Cache for the GodotInstance::start() method bind
+    // Cache for the GodotInstance method binds
     private static nint startMethodBind;
+    private static nint iterationMethodBind;
 
     [LibraryImport(LIBGODOT_LIBRARY_NAME)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -106,6 +106,17 @@ internal static unsafe partial class LibGodot
                     // Hash 2240911060 is the signature hash for: bool method() with no parameters
                     startMethodBind = classdbGetMethodBind((nint) pClassName, (nint) pMethodName, 2240911060);
                 }
+
+                // Bind GodotInstance::iteration() method
+                fixed (byte* iterationMethodStr = "iteration"u8)
+                {
+                    stringNameNewWithLatin1Chars((nint) pMethodName, (nint) iterationMethodStr, 0);
+                    // Hash 2240911060 is for bool method() with no parameters
+                    iterationMethodBind = classdbGetMethodBind((nint) pClassName, (nint) pMethodName, 2240911060);
+                }
+                
+                // Note: GodotInstance::stop() is not bound in Godot's _bind_methods(),
+                // so we can't call it via ClassDB. Cleanup is handled by libgodot_destroy_godot_instance instead.
             }
         }
 
@@ -142,17 +153,31 @@ internal static unsafe partial class LibGodot
         return returnValue[0] != 0;
     }
 
-    // Helper to get GodotInstance from pointer
-    public static GodotInstance? GetGodotInstanceFromPtr(nint godotInstancePtr)
+    // Minimal binding for GodotInstance::iteration()
+    public static bool CallGodotInstanceIteration(nint godotInstancePtr)
     {
-        if (objectGetInstanceId == null) throw new InvalidOperationException("GDExtension interface functions not loaded");
+        if (objectMethodBindPtrcall == null) throw new InvalidOperationException("GDExtension interface functions not loaded");
+        if (iterationMethodBind == 0) throw new InvalidOperationException("GodotInstance::iteration() method bind not initialized");
 
-        // Get the instance ID from the pointer
-        var instanceId = objectGetInstanceId(godotInstancePtr);
-        if (instanceId == 0) return null;
+        // Call the method using the raw object pointer
+        Span<byte> returnValue = stackalloc byte[1];
+        fixed (byte* retPtr = returnValue)
+        {
+            objectMethodBindPtrcall(iterationMethodBind, godotInstancePtr, 0, (nint) retPtr);
+        }
 
-        // Use Godot's internal API to get the managed object from the instance ID
-        var obj = GodotObject.InstanceFromId(instanceId);
-        return obj as GodotInstance;
+        return returnValue[0] != 0;
+    }
+
+    // Note: GodotInstance::stop() is not exposed via ClassDB binding in Godot,
+    // so we cannot call it directly. Cleanup is handled by libgodot_destroy_godot_instance.
+
+    // Helper to get GodotInstanceHandle from pointer
+    public static GodotInstanceHandle GetGodotInstanceFromPtr(nint godotInstancePtr)
+    {
+        if (godotInstancePtr == IntPtr.Zero)
+            throw new ArgumentException("Godot instance pointer cannot be zero", nameof(godotInstancePtr));
+        
+        return new GodotInstanceHandle(godotInstancePtr);
     }
 }
