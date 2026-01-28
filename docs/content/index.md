@@ -48,16 +48,18 @@ features:
 ::: code-group
 
 ```csharp [🎮 Basic Example]
+using Godot;
 using twodog;
 
-using var engine = new Engine("myapp", "./project");
-using var godot = engine.Start();
+// Initialize Godot with your project
+TwoDogInitializer.Initialize("./project");
 
 // Load a scene
 var scene = GD.Load<PackedScene>("res://game.tscn");
-engine.Tree.Root.AddChild(scene.Instantiate());
+TwoDogInitializer.Tree.Root.AddChild(scene.Instantiate());
 
 // Run the main loop
+var godot = TwoDogInitializer.Instance!;
 while (!godot.Iteration())
 {
     // Your code here  –  every frame
@@ -65,10 +67,11 @@ while (!godot.Iteration())
 ```
 
 ```csharp [🧪 Unit Test Example]
-using twodog.xunit;
+using Godot;
+using twodog.tests;
 
 [Collection("GodotHeadless")]
-public class GodotSceneTests(GodotHeadlessFixture godot)
+public class GodotSceneTests(GodotHeadlessFixture fixture)
 {
     [Fact]
     public void LoadScene_ValidPath_Succeeds()
@@ -76,7 +79,7 @@ public class GodotSceneTests(GodotHeadlessFixture godot)
         var scene = GD.Load<PackedScene>("res://game.tscn");
         var instance = scene.Instantiate();
         
-        godot.Tree.Root.AddChild(instance);
+        fixture.Tree.Root.AddChild(instance);
         
         Assert.NotNull(instance.Parent);
     }
@@ -87,15 +90,19 @@ public class GodotSceneTests(GodotHeadlessFixture godot)
 // Build with: dotnet build -c Editor
 // Enables TOOLS_ENABLED for import and editor features
 
+using Godot;
 using twodog;
 
-using var engine = new Engine("importer", "./project");
-using var godot = engine.Start();
+// Initialize Godot with your project
+TwoDogInitializer.Initialize("./project");
 
 // Import a texture with custom settings
 var importer = ResourceImporterTexture.Singleton;
 // Use Godot's full import pipeline
 // Access editor-only APIs like EditorImportPlugin, EditorInterface, etc.
+
+// Clean up when done
+TwoDogInitializer.Shutdown();
 ```
 
 :::

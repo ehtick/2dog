@@ -2,6 +2,39 @@
 
 2dog uses MSBuild properties for configuration. Set these in your `.csproj` file.
 
+## TwoDogInitializer API
+
+The main entry point for using 2dog is the `TwoDogInitializer` static class:
+
+```csharp
+using twodog;
+
+// Initialize Godot with a project (required before using any Godot APIs)
+TwoDogInitializer.Initialize("/path/to/project", headless: false);
+
+// Access the scene tree
+var tree = TwoDogInitializer.Tree;
+
+// Get the instance handle for the main loop
+var godot = TwoDogInitializer.Instance!;
+while (!godot.Iteration()) { }
+
+// Shutdown when done
+TwoDogInitializer.Shutdown();
+```
+
+### API Reference
+
+| Method/Property | Description |
+|----------------|-------------|
+| `Initialize(projectPath, headless)` | Initialize Godot with a project. `headless: true` for no window. |
+| `InitializeWithArgs(args)` | Initialize with custom command-line arguments. |
+| `Shutdown()` | Shut down Godot and release resources. |
+| `IsInitialized` | Whether Godot has been initialized. |
+| `Instance` | The `GodotInstanceHandle` for main loop control. |
+| `Tree` | The `SceneTree` for scene management. |
+| `SetAssemblyDir(path)` | Override the GodotSharp assembly location. Only needed if assemblies are in a non-standard location. |
+
 ## Build Configurations
 
 2dog supports three build configurations that map to different Godot native library builds:

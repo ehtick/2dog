@@ -20,9 +20,7 @@ Starts Godot with rendering enabled. Use for tests that need visual output.
 ```csharp
 public class GodotFixture : IDisposable
 {
-    public Engine Engine { get; }
-    public GodotInstance GodotInstance { get; }
-    public SceneTree Tree { get; }
+    public SceneTree Tree { get; }  // Access to the scene tree
 }
 ```
 
@@ -33,11 +31,11 @@ Starts Godot in headless mode (`--headless`). Use for CI/CD and tests that don't
 ```csharp
 public class GodotHeadlessFixture : IDisposable
 {
-    public Engine Engine { get; }
-    public GodotInstance GodotInstance { get; }
-    public SceneTree Tree { get; }
+    public SceneTree Tree { get; }  // Access to the scene tree
 }
 ```
+
+Both fixtures automatically call `TwoDogInitializer.Initialize()` in their constructor and `TwoDogInitializer.Shutdown()` on dispose.
 
 ## Collection Setup
 
@@ -58,14 +56,17 @@ public class GodotCollection : ICollectionFixture<GodotHeadlessFixture>
 ## Writing Tests
 
 ```csharp
+using Godot;
+using twodog.tests;
+
 [Collection("Godot")]
 public class SceneTests
 {
-    private readonly GodotHeadlessFixture _godot;
+    private readonly GodotHeadlessFixture _fixture;
 
-    public SceneTests(GodotHeadlessFixture godot)
+    public SceneTests(GodotHeadlessFixture fixture)
     {
-        _godot = godot;
+        _fixture = fixture;
     }
 
     [Fact]
@@ -75,7 +76,7 @@ public class SceneTests
         Assert.NotNull(scene);
 
         var instance = scene.Instantiate();
-        _godot.Tree.Root.AddChild(instance);
+        _fixture.Tree.Root.AddChild(instance);
 
         Assert.True(instance.IsInsideTree());
 
@@ -87,6 +88,21 @@ public class SceneTests
     {
         var physics = PhysicsServer3D.Singleton;
         Assert.NotNull(physics);
+    }
+}
+```
+
+You can also use primary constructor syntax for cleaner code:
+
+```csharp
+[Collection("Godot")]
+public class SceneTests(GodotHeadlessFixture fixture)
+{
+    [Fact]
+    public void LoadScene_ValidPath_Succeeds()
+    {
+        var scene = GD.Load<PackedScene>("res://test_scene.tscn");
+        fixture.Tree.Root.AddChild(scene.Instantiate());
     }
 }
 ```
@@ -122,7 +138,7 @@ Different build configurations are useful for different test scenarios:
 Example: Testing asset import functionality:
 ```csharp
 [Collection("Godot")]
-public class ImportTests(GodotHeadlessFixture godot)
+public class ImportTests(GodotHeadlessFixture fixture)
 {
     [Fact]
     public void ImportTexture_ValidFile_Succeeds()

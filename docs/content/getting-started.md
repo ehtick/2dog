@@ -60,20 +60,25 @@ dotnet add package twodog
 Replace `Program.cs`:
 
 ```csharp
+using Godot;
 using twodog;
 
-// Create engine pointing to your Godot project
-using var engine = new Engine("MyGodotApp", "./project");
+// Initialize Godot with your project
+TwoDogInitializer.Initialize("./project");
 
-// Start Godot
-using var godot = engine.Start();
+// Access the scene tree
+var tree = TwoDogInitializer.Tree;
+GD.Print("Godot initialized! Root: ", tree.Root.Name);
 
 // Run the main loop
+var godot = TwoDogInitializer.Instance!;
 while (!godot.Iteration())
 {
     // Your code runs here every frame
-    // Access the scene tree via engine.Tree
 }
+
+// Shutdown when done
+TwoDogInitializer.Shutdown();
 ```
 
 ## Project Structure

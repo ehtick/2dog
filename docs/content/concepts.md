@@ -11,7 +11,7 @@ Godot Process → SceneTree → Your Scripts
 **2dog inverts this:**
 
 ```
-Your .NET Process → twodog.Engine → Godot (as library)
+Your .NET Process → TwoDogInitializer → Godot (as library)
 ```
 
 You control when Godot starts, when frames iterate, and when it shuts down. Godot becomes a rendering/physics/audio library that you drive.
@@ -69,14 +69,17 @@ dotnet build -c Editor   # editor with TOOLS_ENABLED
 
 ## GodotSharp API Access
 
-Once the engine starts, you have full access to the GodotSharp API:
+Once Godot is initialized, you have full access to the GodotSharp API:
 
 ```csharp
-using var engine = new Engine("app", "./project");
-using var godot = engine.Start();
+using Godot;
+using twodog;
+
+// Initialize Godot
+TwoDogInitializer.Initialize("./project");
 
 // Access the scene tree
-SceneTree tree = engine.Tree;
+SceneTree tree = TwoDogInitializer.Tree;
 
 // Load and instantiate scenes
 var scene = GD.Load<PackedScene>("res://my_scene.tscn");
@@ -93,6 +96,7 @@ var physics = PhysicsServer3D.Singleton;
 Unlike traditional Godot where `_Process` callbacks drive your code, you explicitly pump the main loop:
 
 ```csharp
+var godot = TwoDogInitializer.Instance!;
 while (!godot.Iteration())
 {
     // Called every frame
@@ -102,6 +106,9 @@ while (!godot.Iteration())
     if (someCondition)
         break; // Exit when you decide
 }
+
+// Clean up when done
+TwoDogInitializer.Shutdown();
 ```
 
 `Iteration()` returns `true` when Godot wants to quit (e.g., window closed).
@@ -114,12 +121,14 @@ Only one Godot instance can exist per process. This is a Godot limitation, not a
 
 ```csharp
 // This works
-using var engine = new Engine("app", "./project");
-using var godot = engine.Start();
+TwoDogInitializer.Initialize("./project");
 
-// This throws InvalidOperationException
-using var engine2 = new Engine("app2", "./project2");
-var godot2 = engine2.Start(); // ❌ Error!
+// Calling Initialize() again is safe - it's a no-op if already initialized
+TwoDogInitializer.Initialize("./project2"); // No effect, first project still loaded
+
+// To switch projects, you must shutdown first
+TwoDogInitializer.Shutdown();
+TwoDogInitializer.Initialize("./project2"); // Now loads project2
 ```
 
 For testing scenarios, use xUnit's collection fixtures to share a single instance. See [Testing](./testing).
@@ -130,7 +139,7 @@ Godot's `res://` paths resolve relative to the project directory you specify:
 
 ```csharp
 // Project at ./my_project
-new Engine("app", "./my_project");
+TwoDogInitializer.Initialize("./my_project");
 
 // res://scenes/main.tscn → ./my_project/scenes/main.tscn
 var scene = GD.Load<PackedScene>("res://scenes/main.tscn");
