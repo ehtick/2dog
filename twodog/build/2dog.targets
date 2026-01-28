@@ -87,16 +87,25 @@
     <!-- Remove NuGet GodotSharp Assemblies (Template Release Only) -->
     <!-- ============================================ -->
     <!--
-      For template_release builds, remove NuGet GodotSharp assemblies
-      since we provide our own locally-built versions in flat structure.
+      For template_release builds with a local Godot source checkout,
+      remove NuGet GodotSharp assemblies since we provide our own locally-built
+      versions in flat structure.
+      
+      When consuming 2dog as a NuGet package (without local Godot build),
+      keep the official NuGet GodotSharp assemblies.
       
       For editor and template_debug builds, we keep both:
       - Flat NuGet assemblies for .NET to load
       - Nested local assemblies in GodotSharp/Api/Debug/ for Godot runtime
     -->
+    <!--
+      Only remove NuGet GodotSharp assemblies when we have a local source to replace them.
+      If TwoDogGodotApiSourcePath is empty (e.g., consuming 2dog as NuGet package without
+      local Godot build), keep the NuGet GodotSharp assemblies.
+    -->
     <Target Name="TwoDogRemoveNuGetGodotAssemblies"
             BeforeTargets="TwoDogCopyGodotApi"
-            Condition="'$(DesignTimeBuild)' != 'true' And '$(TwoDogBuildType)' == 'template_release'">
+            Condition="'$(DesignTimeBuild)' != 'true' And '$(TwoDogBuildType)' == 'template_release' And '$(TwoDogGodotApiSourcePath)' != '' And Exists('$(TwoDogGodotApiSourcePath)')">
         <ItemGroup>
             <_TwoDogNuGetGodotAssembliesToRemove Include="$(OutputPath)GodotSharp.dll"/>
             <_TwoDogNuGetGodotAssembliesToRemove Include="$(OutputPath)GodotSharp.xml"/>

@@ -10,7 +10,6 @@ using var engine = new Engine("demo", projectPath);
 using var godotInstance = engine.Start();
 GD.Print("Hello from GodotSharp.");
 GD.Print("Scene Root: ", engine.Tree.CurrentScene.Name);
-GD.Print("Ticker: ", engine.Tree.CurrentScene.GetNode<Ticker>("Ticker"));
 
 // You can access the SceneTree via engine.Tree
 
@@ -22,4 +21,4 @@ while (!godotInstance.Iteration())
         break;
 godotInstance.Iteration();
 godotInstance.Iteration();
-Console.WriteLine("Godot is shutting down. Thank you for using 2dog. 🦴");
+Console.WriteLine("Godot is shutting down. Thank you for using 2dog. 🦴");  

@@ -25,9 +25,6 @@
     <PropertyGroup>
         <GodotProjectDir>project</GodotProjectDir>
     </PropertyGroup>
-    <ItemGroup>
-        <ProjectReference Include="../game/game.csproj"/>
-    </ItemGroup>
     <Target Name="DeepClean" AfterTargets="Clean">
         <RemoveDir Directories="$(BaseIntermediateOutputPath)"/>
         <RemoveDir Directories="$(BaseOutputPath)"/>
