@@ -24,8 +24,10 @@ internal static partial class TwoDogModuleInitializer
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool WindowsSetEnv(string lpName, string lpValue);
 
+#pragma warning disable CA2255 // The 'ModuleInitializer' attribute should not be used in libraries
     [ModuleInitializer]
     internal static void Initialize()
+#pragma warning restore CA2255
     {
         // Get the directory where twodog.dll is located
         var assemblyLocation = typeof(TwoDogModuleInitializer).Assembly.Location;
