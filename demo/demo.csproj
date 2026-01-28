@@ -23,7 +23,7 @@
         <PackageReference Include="2dog.osx-x64" Version="0.1.0-pre"/>
     </ItemGroup>
     <PropertyGroup>
-        <GodotProjectDir>../game</GodotProjectDir>
+        <GodotProjectDir>project</GodotProjectDir>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="../game/game.csproj"/>
