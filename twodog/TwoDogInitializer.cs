@@ -222,10 +222,14 @@ public static partial class TwoDogInitializer
     /// The method automatically:
     /// </para>
     /// <list type="number">
-    ///   <item><description>Sets <c>GODOT_ASSEMBLY_DIR</c> to help Godot find GodotSharp assemblies</description></item>
     ///   <item><description>Creates a Godot instance with the specified project</description></item>
     ///   <item><description>Starts the Godot engine and initializes the scene tree</description></item>
     /// </list>
+    /// <para>
+    /// <strong>Note:</strong> The <c>GODOT_ASSEMBLY_DIR</c> environment variable is automatically
+    /// set by twodog's module initializer when the assembly loads, before any user code runs.
+    /// This ensures libgodot can find the GodotSharp assemblies.
+    /// </para>
     /// <para>
     /// <strong>Headless Mode:</strong> When <paramref name="headless"/> is <see langword="true"/>,
     /// Godot runs without a display server. This is useful for:
@@ -261,8 +265,8 @@ public static partial class TwoDogInitializer
             if (IsInitialized)
                 return;
 
-            // Automatically set GODOT_ASSEMBLY_DIR based on twodog's location
-            SetAssemblyDirFromTwoDogLocation();
+            // Note: GODOT_ASSEMBLY_DIR is already set by the module initializer (TwoDogModuleInitializer)
+            // which runs when the twodog assembly is loaded, before any user code.
 
             // Build args
             var args = headless
@@ -298,6 +302,10 @@ public static partial class TwoDogInitializer
     /// <para>
     /// The first argument is typically the application name (e.g., "twodog").
     /// </para>
+    /// <para>
+    /// <strong>Note:</strong> The <c>GODOT_ASSEMBLY_DIR</c> environment variable is automatically
+    /// set by twodog's module initializer when the assembly loads.
+    /// </para>
     /// </remarks>
     /// <exception cref="InvalidOperationException">
     /// Thrown if Godot fails to initialize.
@@ -320,7 +328,7 @@ public static partial class TwoDogInitializer
             if (IsInitialized)
                 return;
 
-            SetAssemblyDirFromTwoDogLocation();
+            // Note: GODOT_ASSEMBLY_DIR is already set by the module initializer
             InitializeGodotCore(args);
         }
     }
@@ -379,7 +387,7 @@ public static partial class TwoDogInitializer
     }
 
     /// <summary>
-    /// Manually sets the <c>GODOT_ASSEMBLY_DIR</c> environment variable.
+    /// Manually overrides the <c>GODOT_ASSEMBLY_DIR</c> environment variable.
     /// </summary>
     /// <param name="assemblyDir">
     /// The directory containing the GodotSharp assemblies (<c>GodotSharp.dll</c>,
@@ -387,13 +395,14 @@ public static partial class TwoDogInitializer
     /// </param>
     /// <remarks>
     /// <para>
-    /// This method allows you to override the default assembly directory location.
-    /// By default, <see cref="Initialize"/> automatically sets this based on the
-    /// location of the twodog assembly. Most users don't need to call this method.
+    /// By default, the module initializer automatically sets <c>GODOT_ASSEMBLY_DIR</c>
+    /// based on the location of the twodog assembly when it loads. Most users don't
+    /// need to call this method.
     /// </para>
     /// <para>
     /// <strong>When to use:</strong> Call this method BEFORE <see cref="Initialize"/>
     /// if the GodotSharp assemblies are in a different location than the twodog assembly.
+    /// This will override the value set by the module initializer.
     /// </para>
     /// <para>
     /// The environment variable is set at both the .NET runtime level and the native
@@ -417,19 +426,6 @@ public static partial class TwoDogInitializer
 
         var absolutePath = Path.GetFullPath(assemblyDir);
         SetNativeEnvironmentVariable("GODOT_ASSEMBLY_DIR", absolutePath);
-    }
-
-    private static void SetAssemblyDirFromTwoDogLocation()
-    {
-        var assemblyLocation = typeof(TwoDogInitializer).Assembly.Location;
-        if (string.IsNullOrEmpty(assemblyLocation))
-            throw new InvalidOperationException("Cannot determine twodog assembly location");
-
-        var assemblyDir = Path.GetDirectoryName(assemblyLocation);
-        if (string.IsNullOrEmpty(assemblyDir))
-            throw new InvalidOperationException("Cannot determine twodog assembly directory");
-
-        SetAssemblyDir(assemblyDir);
     }
 
     private static void SetNativeEnvironmentVariable(string name, string value)

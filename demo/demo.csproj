@@ -25,6 +25,9 @@
     <PropertyGroup>
         <GodotProjectDir>project</GodotProjectDir>
     </PropertyGroup>
+    <!-- Import twodog targets for GodotSharp API copying (needed for ProjectReference builds) -->
+    <Import Project="../twodog/build/2dog.targets"/>
+
     <Target Name="DeepClean" AfterTargets="Clean">
         <RemoveDir Directories="$(BaseIntermediateOutputPath)"/>
         <RemoveDir Directories="$(BaseOutputPath)"/>
