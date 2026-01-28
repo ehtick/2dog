@@ -28,7 +28,7 @@ internal struct GDExtensionInitialization
 
 internal static unsafe partial class LibGodot
 {
-    private const string LIBGODOT_LIBRARY_NAME = "libgodot2";
+    private const string LIBGODOT_LIBRARY_NAME = "libgodot";
 
     // StringName size (from godot-cpp)
     private const int STRING_NAME_SIZE = 8;
