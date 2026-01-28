@@ -12,9 +12,8 @@ TwoDogInitializer.Initialize(projectPath);
 GD.Print("Hello from GodotSharp.");
 GD.Print("Scene Root: ", TwoDogInitializer.Tree.CurrentScene.Name);
 
-Console.WriteLine("Godot is running, close window or press 'Q' to quit.");
-
 // Main game loop - runs until window closes or 'Q' is pressed
+Console.WriteLine("Godot is running, close window or press 'Q' to quit.");
 var godot = TwoDogInitializer.Instance!;
 while (!godot.Iteration())
 {
