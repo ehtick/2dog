@@ -5,6 +5,11 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
+        <RootNamespace>twodog.tests</RootNamespace>
+        <!-- Enable TwoDog path generation for module initializer -->
+        <!-- Disabled - ModuleInitializer.cs resolves paths at runtime -->
+        <!-- <TwoDogGenerateProjectPaths>true</TwoDogGenerateProjectPaths> -->
+        <!-- <TwoDogGodotProjectDir>$(MSBuildProjectDirectory)/../game</TwoDogGodotProjectDir> -->
     </PropertyGroup>
 
     <ItemGroup>

@@ -36,15 +36,13 @@ public sealed class GodotInstanceHandle : IDisposable
     }
 
     // Note: GodotInstance::stop() is not exposed via ClassDB in Godot,
-    // so we cannot call it. Cleanup is handled by Engine.Dispose() which
-    // calls libgodot_destroy_godot_instance.
+    // so we cannot call it.
 
     public void Dispose()
     {
         if (_disposed) return;
         _disposed = true;
-        // Note: The actual destruction of the Godot instance is handled by Engine.Dispose()
-        // which calls libgodot_destroy_godot_instance. We don't destroy here to avoid
-        // double-free issues.
+        // Note: The Godot instance lifecycle is managed by TwoDogInitializer.
+        // We don't destroy here to avoid double-free issues.
     }
 }

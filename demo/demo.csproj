@@ -9,8 +9,8 @@
         <VerifyReferenceTrimCompatibility>true</VerifyReferenceTrimCompatibility>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="2dog" Version="0.1.0-pre"/>
-        <PackageReference Include="GodotSharp" Version="4.6.0"/>
+        <!-- Use project reference for local development -->
+        <ProjectReference Include="../twodog/twodog.csproj"/>
     </ItemGroup>
     <!-- Platform-specific native library packages (meta packages pull in all variants) -->
     <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">

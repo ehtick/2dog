@@ -3,9 +3,29 @@ using Godot;
 namespace twodog.tests;
 
 /// <summary>
-/// Tests that verify GodotSharp objects can be instantiated and used correctly.
+/// Tests that verify GodotSharp objects can be used correctly.
 /// These tests validate that the libgodot integration is working properly
-/// by exercising both value types and reference types from GodotSharp.
+/// by exercising value types from GodotSharp.
+/// 
+/// <para><b>LIMITATION:</b> Creating GodotObject instances (e.g., <c>new Node()</c>) 
+/// currently crashes in the test environment due to a static initialization order problem.
+/// The GodotSharp bindings use static field initializers that call native functions 
+/// (via <c>ClassDB_get_constructor</c>) before <c>NativeFuncs.Initialize()</c> is called.
+/// This is a fundamental architectural issue that requires changes to the Godot fork 
+/// to support lazy initialization of native constructors.</para>
+/// 
+/// <para>What works:</para>
+/// <list type="bullet">
+/// <item>Value types (Vector2, Vector3, Color, Quaternion, etc.) - pure C# structs</item>
+/// <item>Type availability checks (typeof(Node) works)</item>
+/// <item>Existing scene tree operations via the fixture's Tree property</item>
+/// </list>
+/// 
+/// <para>What doesn't work (crashes):</para>
+/// <list type="bullet">
+/// <item>Creating instances: <c>new Node()</c>, <c>new Node2D()</c>, etc.</item>
+/// <item>StringName/NodePath constructors with string arguments</item>
+/// </list>
 /// </summary>
 [Collection("Godot")]
 public class GodotObjectTests(GodotHeadlessFixture godot)

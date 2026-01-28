@@ -1,43 +1,39 @@
 using System.Reflection;
 using Godot;
 using JetBrains.Annotations;
-using Environment = System.Environment;
 
 namespace twodog.tests;
 
+/// <summary>
+/// xUnit fixture for headless Godot testing.
+/// 
+/// Automatically initializes Godot in headless mode with the game project.
+/// </summary>
 [UsedImplicitly]
 public class GodotHeadlessFixture : IDisposable
 {
     public GodotHeadlessFixture()
     {
-        Console.WriteLine("Initializing Godot...");
-        Console.WriteLine("cwd: " + Environment.CurrentDirectory);
+        Console.WriteLine("Initializing Godot fixture...");
 
         // Resolve the project path relative to the assembly location
         var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var projectPath = Path.GetFullPath(Path.Combine(assemblyDir, "..", "..", "..", "..", "game"));
-        
-        // Note: GODOT_ASSEMBLY_DIR is automatically set by the Engine static constructor
-        // to help libgodot find GodotPlugins.dll and GodotSharp.dll
 
-        Engine = new Engine("twodog.tests", projectPath, "--headless");
-        GodotInstance = Engine.Start();
-        Console.WriteLine("Godot initialized successfully.");
+        // Initialize Godot with the project in headless mode
+        TwoDogInitializer.Initialize(projectPath, headless: true);
+        
+        Console.WriteLine("Godot fixture initialized successfully.");
     }
 
-    public Engine Engine { get; }
-
-    public GodotInstanceHandle GodotInstance { get; }
-
-    public SceneTree Tree => Engine.Tree;
+    public SceneTree Tree => Godot.Engine.Singleton.GetMainLoop() as SceneTree ??
+                             throw new NullReferenceException("Failed to get SceneTree.");
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-
         Console.WriteLine("Shutting down Godot...");
-        GodotInstance.Dispose();
-        Engine.Dispose();
-        Console.WriteLine("Godot shut down successfully.");
+        TwoDogInitializer.Shutdown();
+        Console.WriteLine("Godot fixture disposed.");
     }
 }
