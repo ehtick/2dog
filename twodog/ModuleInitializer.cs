@@ -48,12 +48,15 @@ internal static partial class TwoDogModuleInitializer
     /// and GodotSharp.dll in various locations, and when running via 'dotnet test' or as an
     /// embedded library, the executable directory points to dotnet's location rather than
     /// the application output directory where the assemblies are located.
+    /// 
+    /// Note: You may still see "ERROR: .NET: Assemblies not found" during Godot initialization.
+    /// This is expected - Godot checks multiple paths before finding the assemblies via
+    /// GODOT_ASSEMBLY_DIR. The error is logged but does not prevent successful initialization.
     /// </summary>
     [ModuleInitializer]
     internal static void Initialize()
     {
         // Only set if not already set (allow explicit override)
-        // Check both .NET and native environment
         if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GODOT_ASSEMBLY_DIR")))
         {
             var assemblyLocation = typeof(TwoDogModuleInitializer).Assembly.Location;
