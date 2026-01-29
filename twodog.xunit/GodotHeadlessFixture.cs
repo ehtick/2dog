@@ -20,20 +20,20 @@ public class GodotHeadlessFixture : IDisposable
         var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var projectPath = Path.GetFullPath(Path.Combine(assemblyDir, "..", "..", "..", "..", "game"));
 
-        // Initialize Godot with the project in headless mode
-        TwoDogInitializer.Initialize(projectPath, headless: true);
-        
+        Engine = Engine.Create("twodog.tests", "--path", projectPath, "--headless");
+
         Console.WriteLine("Godot fixture initialized successfully.");
     }
 
-    public SceneTree Tree => Godot.Engine.Singleton.GetMainLoop() as SceneTree ??
-                             throw new NullReferenceException("Failed to get SceneTree.");
+    public Engine Engine { get; }
+
+    public SceneTree Tree => Engine.Tree;
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
         Console.WriteLine("Shutting down Godot...");
-        TwoDogInitializer.Shutdown();
+        Engine.Dispose();
         Console.WriteLine("Godot fixture disposed.");
     }
 }

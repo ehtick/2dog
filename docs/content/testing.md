@@ -35,7 +35,7 @@ public class GodotHeadlessFixture : IDisposable
 }
 ```
 
-Both fixtures automatically call `TwoDogInitializer.Initialize()` in their constructor and `TwoDogInitializer.Shutdown()` on dispose.
+Both fixtures automatically create a Godot `Engine` instance in their constructor and dispose it on cleanup.
 
 ## Collection Setup
 

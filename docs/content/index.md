@@ -49,18 +49,17 @@ features:
 
 ```csharp [🎮 Basic Example]
 using Godot;
-using twodog;
+using Engine = twodog.Engine;
 
-// Initialize Godot with your project
-TwoDogInitializer.Initialize("./project");
+// Create and start the Godot engine with your project
+using var engine = Engine.Create("myapp", "--path", "./project");
 
 // Load a scene
 var scene = GD.Load<PackedScene>("res://game.tscn");
-TwoDogInitializer.Tree.Root.AddChild(scene.Instantiate());
+engine.Tree.Root.AddChild(scene.Instantiate());
 
 // Run the main loop
-var godot = TwoDogInitializer.Instance!;
-while (!godot.Iteration())
+while (!engine.Instance.Iteration())
 {
     // Your code here  –  every frame
 }
@@ -91,18 +90,17 @@ public class GodotSceneTests(GodotHeadlessFixture fixture)
 // Enables TOOLS_ENABLED for import and editor features
 
 using Godot;
-using twodog;
+using Engine = twodog.Engine;
 
-// Initialize Godot with your project
-TwoDogInitializer.Initialize("./project");
+// Create and start the Godot engine with your project
+using var engine = Engine.Create("mytool", "--path", "./project");
 
 // Import a texture with custom settings
 var importer = ResourceImporterTexture.Singleton;
 // Use Godot's full import pipeline
 // Access editor-only APIs like EditorImportPlugin, EditorInterface, etc.
 
-// Clean up when done
-TwoDogInitializer.Shutdown();
+// Engine is automatically cleaned up via Dispose
 ```
 
 :::

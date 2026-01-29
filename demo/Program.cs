@@ -1,21 +1,20 @@
 using System.Reflection;
 using Godot;
-using twodog;
+using Engine = twodog.Engine;
 
 // Resolve the project path relative to the assembly location
 var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 var projectPath = Path.GetFullPath(Path.Combine(assemblyDir, "..", "..", "..", "..", "game"));
 
-// Initialize Godot with the project
-TwoDogInitializer.Initialize(projectPath);
+// Create and start the Godot engine
+using var engine = Engine.Create("demo", "--path", projectPath);
 
 GD.Print("Hello from GodotSharp.");
-GD.Print("Scene Root: ", TwoDogInitializer.Tree.CurrentScene.Name);
+GD.Print("Scene Root: ", engine.Tree.CurrentScene.Name);
 
-// Main game loop - runs until window closes or 'Q' is pressed
 Console.WriteLine("Godot is running, close window or press 'Q' to quit.");
-var godot = TwoDogInitializer.Instance!;
-while (!godot.Iteration())
+
+while (!engine.Instance.Iteration())
 {
     if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Q)
         break;

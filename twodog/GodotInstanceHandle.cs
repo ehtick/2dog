@@ -42,7 +42,7 @@ public sealed class GodotInstanceHandle : IDisposable
     {
         if (_disposed) return;
         _disposed = true;
-        // Note: The Godot instance lifecycle is managed by TwoDogInitializer.
+        // Note: The Godot instance lifecycle is managed by Engine.
         // We don't destroy here to avoid double-free issues.
     }
 }

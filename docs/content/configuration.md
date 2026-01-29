@@ -2,38 +2,40 @@
 
 2dog uses MSBuild properties for configuration. Set these in your `.csproj` file.
 
-## TwoDogInitializer API
+## Engine API
 
-The main entry point for using 2dog is the `TwoDogInitializer` static class:
+The main entry point for using 2dog is the `Engine` class with its `Create` factory method:
 
 ```csharp
-using twodog;
+using Engine = twodog.Engine;
 
-// Initialize Godot with a project (required before using any Godot APIs)
-TwoDogInitializer.Initialize("/path/to/project", headless: false);
+// Create and start a Godot engine instance
+using var engine = Engine.Create("myapp", "--path", "/path/to/project");
 
 // Access the scene tree
-var tree = TwoDogInitializer.Tree;
+var tree = engine.Tree;
 
-// Get the instance handle for the main loop
-var godot = TwoDogInitializer.Instance!;
-while (!godot.Iteration()) { }
+// Run the main loop
+while (!engine.Instance.Iteration()) { }
 
-// Shutdown when done
-TwoDogInitializer.Shutdown();
+// Engine is automatically cleaned up via Dispose
+```
+
+For headless mode (no window), add `"--headless"` to the arguments:
+
+```csharp
+using var engine = Engine.Create("myapp", "--path", "./project", "--headless");
 ```
 
 ### API Reference
 
 | Method/Property | Description |
 |----------------|-------------|
-| `Initialize(projectPath, headless)` | Initialize Godot with a project. `headless: true` for no window. |
-| `InitializeWithArgs(args)` | Initialize with custom command-line arguments. |
-| `Shutdown()` | Shut down Godot and release resources. |
-| `IsInitialized` | Whether Godot has been initialized. |
-| `Instance` | The `GodotInstanceHandle` for main loop control. |
-| `Tree` | The `SceneTree` for scene management. |
-| `SetAssemblyDir(path)` | Override the GodotSharp assembly location. Only needed if assemblies are in a non-standard location. |
+| `Engine.Create(args)` | Static factory method. Creates and starts a Godot instance with the given command-line arguments. Returns an `Engine`. |
+| `Engine.SetAssemblyDir(path)` | Static. Override the GodotSharp assembly location before calling `Create`. Only needed if assemblies are in a non-standard location. |
+| `engine.Instance` | The `GodotInstanceHandle` for main loop control. |
+| `engine.Tree` | The `SceneTree` for scene management. |
+| `engine.Dispose()` | Shut down Godot and release resources. Called automatically with `using`. |
 
 ## Build Configurations
 

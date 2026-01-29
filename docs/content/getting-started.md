@@ -61,24 +61,21 @@ Replace `Program.cs`:
 
 ```csharp
 using Godot;
-using twodog;
+using Engine = twodog.Engine;
 
-// Initialize Godot with your project
-TwoDogInitializer.Initialize("./project");
+// Create and start the Godot engine with your project
+using var engine = Engine.Create("myapp", "--path", "./project");
 
 // Access the scene tree
-var tree = TwoDogInitializer.Tree;
-GD.Print("Godot initialized! Root: ", tree.Root.Name);
+GD.Print("Godot initialized! Root: ", engine.Tree.Root.Name);
 
 // Run the main loop
-var godot = TwoDogInitializer.Instance!;
-while (!godot.Iteration())
+while (!engine.Instance.Iteration())
 {
     // Your code runs here every frame
 }
 
-// Shutdown when done
-TwoDogInitializer.Shutdown();
+// Engine is automatically cleaned up via Dispose
 ```
 
 ## Project Structure

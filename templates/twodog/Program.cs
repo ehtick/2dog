@@ -1,19 +1,18 @@
 using Godot;
-using twodog;
+using Engine = twodog.Engine;
 
-// Initialize Godot with your project
-TwoDogInitializer.Initialize("./project");
+// Create and start the Godot engine with your project
+using var engine = Engine.Create("Company.Product1", "--path", "./project");
 
 // Load your main scene
 var scene = GD.Load<PackedScene>("res://main.tscn");
-TwoDogInitializer.Tree.Root.AddChild(scene.Instantiate());
+engine.Tree.Root.AddChild(scene.Instantiate());
 
 GD.Print("2dog is running! Close window or press 'Q' to quit.");
 Console.WriteLine("Press 'Q' to quit.");
 
 // Main game loop - runs until window closes or 'Q' is pressed
-var godot = TwoDogInitializer.Instance!;
-while (!godot.Iteration())
+while (!engine.Instance.Iteration())
 {
     if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Q)
         break;

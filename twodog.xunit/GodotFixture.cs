@@ -20,19 +20,20 @@ public class GodotFixture : IDisposable
         var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var projectPath = Path.GetFullPath(Path.Combine(assemblyDir, "..", "..", "..", "..", "project"));
 
-        // Initialize Godot with the project (not headless)
-        TwoDogInitializer.Initialize(projectPath, headless: false);
-        
+        Engine = Engine.Create("twodog.tests", "--path", projectPath);
+
         Console.WriteLine("Godot fixture initialized successfully.");
     }
 
-    public SceneTree Tree => TwoDogInitializer.Tree;
+    public Engine Engine { get; }
+
+    public SceneTree Tree => Engine.Tree;
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
         Console.WriteLine("Shutting down Godot...");
-        TwoDogInitializer.Shutdown();
+        Engine.Dispose();
         Console.WriteLine("Godot fixture disposed.");
     }
 }
